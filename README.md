@@ -1,25 +1,38 @@
-# Screen Coach (Makine Mühendisliği Öğrencisi için)
+# Makine Mühendisliği Öğrenci Portalı
 
-Bu araç günlük ekran süreni dakika bazında tutar, durumunu değerlendirir ve ekran başından kalkman için **makine mühendisliği odaklı görevler** önerir.
+Bu proje, makine mühendisi öğrencilerin tek yerden ulaşabileceği **güncel bağlantı portalı** sunar.
 
-## Kurallar
-- **0–2 saat**: İyi
-- **2–5 saat**: Orta (görev önerilir)
-- **5+ saat**: Kötü (daha kapsamlı görev önerilir)
+## Özellikler
+- Sol menüde kategori bazlı sade gezinme:
+  - Güncel Haberler
+  - Staj Programları
+  - Bitirme Projeleri
+  - Yarışma Programları
+  - Online Oturumlar
+  - Fiziksel Oturumlar
+- Mavi-beyaz, basit ve okunabilir arayüz.
+- Kategoriye tıklandığında bağlantılar yeni sekmede açılır.
+- İçerikler internetten RSS ile çekilir.
+- Veriler **8 saatte bir** yenilenir.
+- Her kategoride en fazla **50 bağlantı** tutulur.
 
-## Kullanım
-Python 3 ile çalıştır:
-
+## Kurulum
 ```bash
-python3 screen_coach.py log 60
-python3 screen_coach.py status
-python3 screen_coach.py suggest
-python3 screen_coach.py suggest --deep
+python3 -m venv .venv
+source .venv/bin/activate
+pip install flask
 ```
 
-## Veri dosyası
-Kayıtlar şu dosyada tutulur:
+## Çalıştırma
+```bash
+python3 app.py
+```
 
-`data/screen_time_log.json`
+Ardından tarayıcıda:
 
-Her gün için `YYYY-MM-DD` anahtarı altında toplam dakika saklanır.
+`http://127.0.0.1:5000`
+
+## Veri önbelleği
+Bağlantılar şu dosyada saklanır:
+
+`data/links_cache.json`
