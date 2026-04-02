@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | MM Link Merkezi{% endblock %}
+
+{% block content %}
+<section>
+  <h2>{{ title }}</h2>
+  <p>Bu kategoride en fazla {{ max_links }} bağlantı listelenir.</p>
+
+  {% if slug in ['staj-programlari', 'online-oturumlar', 'fiziksel-oturumlar'] %}
+  <p class="timestamp">Filtreleme referans tarihi: {{ reference_today }}</p>
+  {% endif %}
+
+  {% if updated_at %}
+  <p class="timestamp">Son güncelleme: {{ updated_at }}</p>
+  {% endif %}
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  {% if links %}
+  <ol class="link-list">
+    {% for item in links %}
+    <li>
+      <a href="{{ item.url }}" target="_blank" rel="noreferrer">{{ item.title }}</a>
+      {% if item.published %}
+      <span>{{ item.published }}</span>
+      {% endif %}
+      {% if item.summary %}
+      <p class="summary">{{ item.summary|striptags|truncate(180, True, '...') }}</p>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p>Henüz bağlantı bulunamadı. Lütfen biraz sonra tekrar deneyin.</p>
+  {% endif %}
+</section>
+{% endblock %}

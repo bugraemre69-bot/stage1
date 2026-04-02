@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Makine Mühendisliği Kaynak Portalı{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h2>Makine Mühendisliği Öğrencileri için Güncel Kaynak Portalı</h2>
+  <p>
+    Bu portal; güncel haberler, staj programları, bitirme projeleri, yarışmalar ve
+    oturum bağlantılarını tek noktada toplar.
+  </p>
+  <p>
+    Sistem bağlantıları internetten çeker ve <strong>8 saatte bir</strong> yeniler.
+    Her başlık altında en fazla <strong>50 bağlantı</strong> gösterilir.
+  </p>
+  <p class="timestamp">Staj/oturum filtreleri için referans tarih: <strong>{{ reference_today }}</strong></p>
+  {% if updated_at %}
+  <p class="timestamp">Son güncelleme: {{ updated_at }}</p>
+  {% endif %}
+</section>
+
+<section class="visual-panel">
+  <h3>Makine Dünyası</h3>
+  <div class="image-grid">
+    <img src="{{ url_for('static', filename='img/gear-1.svg') }}" alt="Mavi dişli çizimi" />
+    <img src="{{ url_for('static', filename='img/gear-2.svg') }}" alt="Dişli mekanizması" />
+    <img src="{{ url_for('static', filename='img/rotor.svg') }}" alt="Mil ve rotor çizimi" />
+  </div>
+</section>
+
+<section class="task-panel">
+  <h3>Bugünün Araştırma Görevi</h3>
+  <p>Butona bas, sana hızlı bir makine mühendisliği araştırma görevi gelsin.</p>
+  <button id="task-btn" class="task-btn">Görev Al</button>
+  <div id="task-result" class="task-result">Henüz görev seçmedin.</div>
+</section>
+
+<script>
+  const tasks = [
+    "Kompozit malzemelerin otomotiv şasisinde kullanımı hakkında 3 güncel örnek bul.",
+    "Bir üretim hattında enerji verimliliğini artırmak için 3 uygulanabilir öneri yaz.",
+    "CFD kullanılan bir türbin optimizasyon çalışmasını özetle ve temel çıktıları listele.",
+    "Bir robotik kol tasarımında dişli oranı seçiminin torka etkisini kısa notla açıkla.",
+    "Endüstri 4.0 kapsamında prediktif bakımın bakım maliyetlerine etkisini araştır.",
+    "Bir ısı değiştirici seçimi için gerekli 5 temel tasarım parametresini topla."
+  ];
+
+  document.getElementById("task-btn").addEventListener("click", () => {
+    const task = tasks[Math.floor(Math.random() * tasks.length)];
+    document.getElementById("task-result").textContent = task;
+  });
+</script>
+{% endblock %}
