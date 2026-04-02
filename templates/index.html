@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Makine Mühendisliği Kaynak Portalı{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h2>Makine Mühendisliği Öğrencileri için Güncel Kaynak Portalı</h2>
+  <p>
+    Bu portal; güncel haberler, staj programları, bitirme projeleri, yarışmalar ve
+    oturum bağlantılarını tek noktada toplar.
+  </p>
+  <p>
+    Sistem bağlantıları internetten çeker ve <strong>8 saatte bir</strong> yeniler.
+    Her başlık altında en fazla <strong>50 bağlantı</strong> gösterilir.
+  </p>
+  {% if updated_at %}
+  <p class="timestamp">Son güncelleme: {{ updated_at }}</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Makine Mühendisliği Link Merkezi{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1>MM Link Merkezi</h1>
+        <p class="subtitle">Mavi & beyaz, sade ve odaklı</p>
+        <nav>
+          <ul>
+            {% for category_slug, meta in categories.items() %}
+            <li>
+              <a href="{{ url_for('category_page', slug=category_slug) }}" target="_blank" rel="noreferrer">
+                {{ meta.title }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">{% block content %}{% endblock %}</main>
+    </div>
+  </body>
+</html>
