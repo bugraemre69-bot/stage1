@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
+from random import choice
 from typing import Any
 from urllib.parse import quote_plus
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
 
-from flask import Flask, abort, render_template
+from flask import Flask, abort, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -17,30 +19,40 @@ CACHE_FILE = Path("data/links_cache.json")
 MAX_LINKS_PER_CATEGORY = 50
 REFRESH_INTERVAL = timedelta(hours=8)
 
-CATEGORIES: dict[str, dict[str, str]] = {
-    "guncel-haberler": {
-        "title": "Güncel Haberler",
-        "query": "makine mühendisliği haber",
+TASKS = [
+    "15 dakika boyunca bir dişli kutusunun çalışma prensibini araştır ve 5 maddeyle özetle.",
+    "Bir otomobil motorunda ısı transferi nerelerde olur? 3 örnek bul ve not al.",
+    "Rulman tiplerini karşılaştır: bilyalı ve makaralı rulmanın kullanım farklarını yaz.",
+    "CNC ile üretilen bir parçanın üretim adımlarını araştırıp kısa bir akış çıkar.",
+    "Bir pompa seçimi yapılırken hangi parametreler kontrol edilir? En az 5 tanesini bul.",
+    "Bir bitirme projesi fikri üret: enerji verimliliği odaklı bir mekanik sistem öner.",
+]
+
+CATEGORIES: dict[str, dict[str, Any]] = {
+    "online-seminerler": {
+        "title": "Online Seminerler",
+        "query": "makine mühendisliği webinar online seminer",
+        "max_age_days": 60,
     },
-    "staj-programlari": {
-        "title": "Staj Programları",
-        "query": "makine mühendisliği staj programı",
+    "fiziksel-seminerler": {
+        "title": "Fiziksel Seminerler",
+        "query": "makine mühendisliği konferans etkinlik seminer",
+        "max_age_days": 60,
+    },
+    "staj-ilanlari": {
+        "title": "Staj İlanları",
+        "query": "makine mühendisliği staj ilanı",
+        "max_age_days": 120,
     },
     "bitirme-projeleri": {
         "title": "Bitirme Projeleri",
         "query": "makine mühendisliği bitirme projesi",
+        "max_age_days": None,
     },
-    "yarisma-programlari": {
-        "title": "Yarışma Programları",
-        "query": "makine mühendisliği yarışma",
-    },
-    "online-oturumlar": {
-        "title": "Online Oturumlar",
-        "query": "makine mühendisliği online seminer webinar",
-    },
-    "fiziksel-oturumlar": {
-        "title": "Fiziksel Oturumlar",
-        "query": "makine mühendisliği konferans etkinlik",
+    "ucretsiz-online-kurslar": {
+        "title": "Online ve Ücretsiz Kurslar",
+        "query": "free online mechanical engineering course certificate",
+        "max_age_days": 365,
     },
 }
 
@@ -65,7 +77,23 @@ def save_cache(cache: dict[str, Any]) -> None:
         json.dump(cache, file, ensure_ascii=False, indent=2)
 
 
-def fetch_news(query: str, limit: int = MAX_LINKS_PER_CATEGORY) -> list[dict[str, str]]:
+def parse_pub_date(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = parsedate_to_datetime(value)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def fetch_news(
+    query: str,
+    limit: int = MAX_LINKS_PER_CATEGORY,
+    max_age_days: int | None = None,
+) -> list[dict[str, str]]:
     url = build_rss_url(query)
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urlopen(req, timeout=15) as response:
@@ -74,11 +102,19 @@ def fetch_news(query: str, limit: int = MAX_LINKS_PER_CATEGORY) -> list[dict[str
     root = ET.fromstring(xml_text)
     items: list[dict[str, str]] = []
     seen_links: set[str] = set()
+    cutoff = None
+
+    if max_age_days is not None:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
 
     for item in root.findall("./channel/item"):
         title = (item.findtext("title") or "Başlıksız bağlantı").strip()
         link = (item.findtext("link") or "").strip()
         pub_date = (item.findtext("pubDate") or "").strip()
+        parsed_date = parse_pub_date(pub_date)
+
+        if cutoff is not None and parsed_date is not None and parsed_date < cutoff:
+            continue
 
         if not link or link in seen_links:
             continue
@@ -108,7 +144,11 @@ def refresh_cache(force: bool = False) -> dict[str, Any]:
 
     for slug, meta in CATEGORIES.items():
         try:
-            links = fetch_news(meta["query"], limit=MAX_LINKS_PER_CATEGORY)
+            links = fetch_news(
+                meta["query"],
+                limit=MAX_LINKS_PER_CATEGORY,
+                max_age_days=meta.get("max_age_days"),
+            )
             error = None
         except Exception as exc:  # noqa: BLE001
             links = cache.get("categories", {}).get(slug, {}).get("links", [])
@@ -132,7 +172,13 @@ def home() -> str:
         "index.html",
         categories=CATEGORIES,
         updated_at=cache.get("updated_at"),
+        today_task=choice(TASKS),
     )
+
+
+@app.route("/gorev")
+def today_task() -> Any:
+    return jsonify({"task": choice(TASKS)})
 
 
 @app.route("/kategori/<slug>")

@@ -1,20 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}Makine Mühendisliği Kaynak Portalı{% endblock %}
+{% block title %}Makine Mühendisliği Öğrenci Rehberi{% endblock %}
 
 {% block content %}
 <section class="hero">
-  <h2>Makine Mühendisliği Öğrencileri için Güncel Kaynak Portalı</h2>
+  <h2>Makine Mühendisliği Öğrencileri için Yol Gösterici Portal</h2>
   <p>
-    Bu portal; güncel haberler, staj programları, bitirme projeleri, yarışmalar ve
-    oturum bağlantılarını tek noktada toplar.
+    Online seminerler, fiziksel seminerler, staj ilanları, bitirme projeleri ve
+    online & ücretsiz kurs bağlantılarını tek ekranda toplar.
   </p>
   <p>
-    Sistem bağlantıları internetten çeker ve <strong>8 saatte bir</strong> yeniler.
-    Her başlık altında en fazla <strong>50 bağlantı</strong> gösterilir.
+    Sistem bağlantıları web üzerinden çeker ve <strong>8 saatte bir</strong> otomatik yeniler.
+    Staj ve seminer kategorilerinde eski duyurular tarih filtresiyle temizlenir.
   </p>
   {% if updated_at %}
   <p class="timestamp">Son güncelleme: {{ updated_at }}</p>
   {% endif %}
+
+  <button id="task-btn" class="task-btn">Bugünün görevini al</button>
+  <div class="task-card" id="task-card">
+    <h3>Araştırma görevin</h3>
+    <p id="task-text">{{ today_task }}</p>
+  </div>
+
+  <div class="silhouette-row" aria-hidden="true">
+    <div class="silhouette gear" title="Çark"></div>
+    <div class="silhouette engine" title="Motor"></div>
+    <div class="silhouette car" title="Araba"></div>
+  </div>
 </section>
+
+<script>
+  const taskButton = document.getElementById("task-btn");
+  const taskText = document.getElementById("task-text");
+
+  taskButton.addEventListener("click", async () => {
+    taskButton.disabled = true;
+    taskButton.textContent = "Yeni görev hazırlanıyor...";
+
+    try {
+      const response = await fetch("{{ url_for('today_task') }}");
+      const payload = await response.json();
+      taskText.textContent = payload.task;
+    } catch (error) {
+      taskText.textContent = "Görev alınamadı. Lütfen birkaç saniye sonra tekrar dene.";
+    } finally {
+      taskButton.disabled = false;
+      taskButton.textContent = "Bugünün görevini al";
+    }
+  });
+</script>
 {% endblock %}

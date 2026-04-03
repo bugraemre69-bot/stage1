@@ -1,20 +1,22 @@
-# Makine Mühendisliği Öğrenci Portalı
+# Makine Mühendisliği Öğrenci Rehberi
 
-Bu proje, makine mühendisi öğrencilerin tek yerden ulaşabileceği **güncel bağlantı portalı** sunar.
+Bu proje, makine mühendisliği öğrencileri için tek yerden erişilebilen bir **güncel bağlantı portalı** sunar.
 
 ## Özellikler
-- Sol menüde kategori bazlı sade gezinme:
-  - Güncel Haberler
-  - Staj Programları
+- Sol menüde kategori bazlı gezinme:
+  - Online Seminerler
+  - Fiziksel Seminerler
+  - Staj İlanları
   - Bitirme Projeleri
-  - Yarışma Programları
-  - Online Oturumlar
-  - Fiziksel Oturumlar
-- Mavi-beyaz, basit ve okunabilir arayüz.
-- Kategoriye tıklandığında bağlantılar yeni sekmede açılır.
+  - Online ve Ücretsiz Kurslar
+- Mavi-beyaz, sade ve okunabilir arayüz.
+- Ana ekranda **“Bugünün görevini al”** butonu.
+  - Buton her tıklamada kullanıcıya ekran dışı bir makine mühendisliği araştırma görevi verir.
+- Ana sayfada makine temalı silüetler (çark, motor, araba).
 - İçerikler internetten RSS ile çekilir.
 - Veriler **8 saatte bir** yenilenir.
 - Her kategoride en fazla **50 bağlantı** tutulur.
+- Staj ve seminer kategorilerinde eski bağlantılar tarih bazlı filtrelenir.
 
 ## Kurulum
 ```bash
