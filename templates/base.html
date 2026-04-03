@@ -9,13 +9,13 @@
   <body>
     <div class="layout">
       <aside class="sidebar">
-        <h1>MM Link Merkezi</h1>
-        <p class="subtitle">Mavi & beyaz, sade ve odaklı</p>
+        <h1>MM Rehber</h1>
+        <p class="subtitle">Mavi & beyaz öğrenci portalı</p>
         <nav>
           <ul>
             {% for category_slug, meta in categories.items() %}
             <li>
-              <a href="{{ url_for('category_page', slug=category_slug) }}" target="_blank" rel="noreferrer">
+              <a href="{{ url_for('category_page', slug=category_slug) }}">
                 {{ meta.title }}
               </a>
             </li>
